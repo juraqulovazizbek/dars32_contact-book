@@ -1,6 +1,5 @@
 import json
-
-from app.contact import Contact
+from typing import List
 
 
 class Storage:
@@ -8,8 +7,15 @@ class Storage:
     def __init__(self):
         self.filename = "database/contacts.json"
 
-    def save(self, contact: Contact):
-        contact_dict = contact.to_dict()
+    def add_contact(self, contact: dict):
+        contacts = self.get_contacts()
+        contacts.append(contact)
+        self.save_contacts(contacts)
 
+    def save_contacts(self, contacts: List[dict]):
         with open(self.filename, "w") as f:
-            json.dump(contact_dict, f, indent=4)
+            json.dump(contacts, f, indent=4)
+
+    def get_contacts(self) -> List[dict]:
+        with open(self.filename) as f:
+            return json.load(f)

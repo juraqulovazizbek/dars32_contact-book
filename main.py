@@ -1,27 +1,30 @@
-from app.contact_book import ContactBook
+from app.commands import Command
 
 
 def main() -> None:
 
-    book = ContactBook()
+    command = Command()
     
     while True:
         print(
             "1 Add new contact\n"
             "2 Show all contacts\n"
             "3 Search contact by name\n"
-            "4 Update or delete contact"
+            "4 Update contact"
+            "5 Delete contact"
         )
 
         choice = input("> ")
         if choice == '1':
-            name = input("name: ")
-            phone = input("phone: ")
-            email = input("email: ")
-
-            book.add_contact(name, phone, email)
+            command.add_contact()
 
         elif choice == '2':
-            book.show_all()
+            command.show_all()
+
+        elif choice == '3':
+            command.search_contact()
+
+        elif choice == '4':
+            command.update_contact()
 
 main()
