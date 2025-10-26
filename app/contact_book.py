@@ -1,61 +1,47 @@
-from typing import List
 
 from app.contact import Contact
 from app.storage import Storage
 
-
 class ContactBook:
-
     def __init__(self):
         self.storage = Storage()
-    
-    def add_contact(self, contact: Contact):
-        contact_dict = contact.to_dict()
-        self.storage.add_contact(contact_dict)
+        self.contacts = []
 
-    def get_contacts(self) -> List[Contact]:
-        contacts = []
-        for contact in self.storage.get_contacts():
-            contacts.append(Contact(
-                id=contact['id'],
-                name=contact['name'],
-                phone=contact['phone'],
-                email=contact['email'],
-            ))
+        data = self.storage.load_all()
+        for item in data:
+            self.contacts.append(Contact(item["name"], item["phone"], item["email"]))
 
-        return contacts
+    def add_contact(self, name, phone, email):
+        contact = Contact(name, phone, email)
+        self.contacts.append(contact)
+        self.storage.save_all(self.contacts)
+        print(f"{name} kontakt qo‘shildi!")
 
-    def get_conatct_by_name(self, search: str) -> List[Contact]:
-        contacts = []
-        for contact in self.storage.get_contacts():
-            if search.lower() in contact['name'].lower():
-                contacts.append(Contact(
-                    id=contact['id'],
-                    name=contact['name'],
-                    phone=contact['phone'],
-                    email=contact['email'],
-                ))
+    def show_all(self):
+        if not self.contacts:
+            print("Kontaktlar yo‘q!")
+        else:
+            print("\n--- Barcha kontaktlar ---")
+            for c in self.contacts:
+                c.show_info()
 
-        return contacts
+    def search_contact(self, name):
+        name = name.strip().lower()
+        results = [c for c in self.contacts if name in c.name.lower()]
 
-    def update_contact(self, contact: Contact) -> Contact:
-        contacts = self.storage.get_contacts()
-        for i, item in enumerate(contacts):
-            if item['id'] == contact.id:
-                contacts[i] = contact.to_dict()
+        if results:
+            print("\nTopildi:")
+            for c in results:
+                c.show_info()
+        else:
+            print("Kontakt topilmadi!")
 
-        self.storage.save_contacts(contacts)
-
-    def delete_contact(self, id: str) -> None:
-        pass
-
-    def get_contact(self, id: str) -> None | Contact:
-        for contact in self.storage.get_contacts():
-            if contact['id'] == id:
-                return Contact(
-                    id=contact['id'],
-                    name=contact['name'],
-                    phone=contact['phone'],
-                    email=contact['email'],
-                )
-            
+    def delete_contact(self, name):
+        name = name.strip().lower()
+        for c in self.contacts:
+            if c.name.lower() == name:
+                self.contacts.remove(c)
+                self.storage.save_all(self.contacts)
+                print(f"{c.name} o‘chirildi!")
+                return
+        print("Bunday kontakt yo‘q")

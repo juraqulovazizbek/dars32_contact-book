@@ -1,21 +1,27 @@
 import json
-from typing import List
-
-
+import os
+import sys
 class Storage:
-
     def __init__(self):
-        self.filename = "database/contacts.json"
+        self.filename = "contacts.json" 
 
-    def add_contact(self, contact: dict):
-        contacts = self.get_contacts()
-        contacts.append(contact)
-        self.save_contacts(contacts)
+    def save_all(self, contacts):
+        data = []
+        for c in contacts:
+            data.append({
+                "name": c.name,
+                "phone": c.phone,
+                "email": c.email
+            })
 
-    def save_contacts(self, contacts: List[dict]):
         with open(self.filename, "w") as f:
-            json.dump(contacts, f, indent=4)
+            json.dump(data, f, indent=4)
 
-    def get_contacts(self) -> List[dict]:
-        with open(self.filename) as f:
-            return json.load(f)
+    def load_all(self):
+        if not os.path.exists(self.filename):
+            return []
+
+        with open(self.filename, "r") as f:
+            data = json.load(f)
+
+        return data
